@@ -1,4 +1,4 @@
-import { HashBrokerMiner } from "./miner.js";
+import { HashBrokerMiner } from "./miner.js?v=20260912-6";
 
 const CONFIG = window.HASH_BROKER_CONFIG;
 const SELECTORS = {

@@ -92,27 +92,41 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
   let startLo = params.values[13];
   let startHi = params.values[14];
   let offsetBase = gid.x * ${ITERATIONS}u;
+  var localBestBits = 0u;
+  var localBestHash: array<u32,8>;
+
   for (var i=0u; i<${ITERATIONS}u; i=i+1u) {
-    if (atomicLoad(&result.found) != 0u) { return; }
     let offset = offsetBase + i;
     let nonceLo = startLo + offset;
     let carry = select(0u, 1u, nonceLo < startLo);
     let nonceHi = startHi + carry;
     let hash = digest(nonceLo, nonceHi);
     let bits = leadingZeros(hash);
-    let previousBest = atomicMax(&result.bestBits, bits);
-    if (bits > previousBest) {
+
+    // Keep the best candidate in private shader memory. The old miner used a
+    // contended global atomic for every hash; this performs one after the
+    // entire per-thread batch instead.
+    if (bits > localBestBits) {
+      localBestBits = bits;
       for (var word = 0u; word < 8u; word = word + 1u) {
-        atomicStore(&result.bestHash[word], hash[word]);
+        localBestHash[word] = hash[word];
       }
     }
+
     if (bits >= params.values[15]) {
       let previous = atomicExchange(&result.found, 1u);
       if (previous == 0u) {
         atomicStore(&result.nonceLo, nonceLo);
         atomicStore(&result.nonceHi, nonceHi);
       }
-      return;
+      break;
+    }
+  }
+
+  let previousBest = atomicMax(&result.bestBits, localBestBits);
+  if (localBestBits > previousBest) {
+    for (var word = 0u; word < 8u; word = word + 1u) {
+      atomicStore(&result.bestHash[word], localBestHash[word]);
     }
   }
 }`;
