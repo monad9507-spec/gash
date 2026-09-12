@@ -7,7 +7,7 @@
     <meta name="description" content="Hash Broker documentation: proof-of-work minting, on-chain art and staking." />
     <title>Hash Broker — Docs</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'%3E%3Crect width='32' height='32' fill='%2305080d'/%3E%3Cpath d='M5 7h22v5H5zm3 5h16v13H8z' fill='%2327e0c1'/%3E%3Cpath d='M11 15h3v3h-3zm7 0h3v3h-3zm-5 6h6v2h-6z' fill='%2303090d'/%3E%3C/svg%3E" />
-    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./style.css?v=20260912-4" />
   </head>
   <body class="docs-page">
     <div class="noise" aria-hidden="true"></div>
@@ -37,10 +37,11 @@
           <span>CONTENTS</span>
           <a href="#overview">01 / OVERVIEW</a>
           <a href="#minting">02 / MINTING</a>
-          <a href="#difficulty">03 / DIFFICULTY</a>
-          <a href="#art">04 / ON-CHAIN ART</a>
-          <a href="#staking">05 / STAKING</a>
-          <a href="#faq">06 / FAQ</a>
+          <a href="#pricing">03 / PRICE EPOCHS</a>
+          <a href="#difficulty">04 / DIFFICULTY</a>
+          <a href="#art">05 / ON-CHAIN ART</a>
+          <a href="#staking">06 / STAKING</a>
+          <a href="#faq">07 / FAQ</a>
         </aside>
 
         <div class="docs-content">
@@ -48,7 +49,7 @@
             <p class="docs-number">01</p>
             <h2>Overview</h2>
             <p>Hash Broker combines a collectible NFT with a permissionless discovery process. You connect a wallet, start the WebGPU miner and search for a valid SHA-256 proof. A successful proof lets you mint one unique cyber-terminal broker.</p>
-            <div class="docs-facts"><div><span>SUPPLY</span><strong>4,444</strong></div><div><span>NETWORK</span><strong>Robinhood Chain</strong></div><div><span>PRICE</span><strong>0.004444 ETH</strong></div><div><span>STORAGE</span><strong>100% ON-CHAIN</strong></div></div>
+            <div class="docs-facts"><div><span>SUPPLY</span><strong>4,444</strong></div><div><span>NETWORK</span><strong>Robinhood Chain</strong></div><div><span>FIRST 100</span><strong>FREE</strong></div><div><span>STORAGE</span><strong>100% ON-CHAIN</strong></div></div>
           </section>
 
           <section class="docs-section" id="minting">
@@ -58,29 +59,67 @@
             <div class="docs-callout"><strong>YOUR WALLET IS PART OF THE PROOF.</strong><span>A proof found by another wallet cannot be submitted by you.</span></div>
           </section>
 
-          <section class="docs-section" id="difficulty">
+          <section class="docs-section" id="pricing">
             <p class="docs-number">03</p>
+            <h2>Price epochs</h2>
+            <p>Hash Brokers #1–100 are free. Starting with #101, paid minting begins at 0.0001 ETH. After every 200 paid mints, the contract automatically adds 0.0001 ETH to the price. The current price is calculated on-chain and displayed live on the mining terminal.</p>
+            <div class="epoch-table-wrap">
+              <table class="epoch-table">
+                <thead><tr><th>EPOCH</th><th>HASH BROKERS</th><th>PRICE / NFT</th></tr></thead>
+                <tbody>
+                  <tr><td>FREE</td><td>#1–100</td><td>0 ETH</td></tr>
+                  <tr><td>01</td><td>#101–300</td><td>0.0001 ETH</td></tr>
+                  <tr><td>02</td><td>#301–500</td><td>0.0002 ETH</td></tr>
+                  <tr><td>03</td><td>#501–700</td><td>0.0003 ETH</td></tr>
+                  <tr><td>04</td><td>#701–900</td><td>0.0004 ETH</td></tr>
+                  <tr><td>05</td><td>#901–1,100</td><td>0.0005 ETH</td></tr>
+                  <tr><td>06</td><td>#1,101–1,300</td><td>0.0006 ETH</td></tr>
+                  <tr><td>07</td><td>#1,301–1,500</td><td>0.0007 ETH</td></tr>
+                  <tr><td>08</td><td>#1,501–1,700</td><td>0.0008 ETH</td></tr>
+                  <tr><td>09</td><td>#1,701–1,900</td><td>0.0009 ETH</td></tr>
+                  <tr><td>10</td><td>#1,901–2,100</td><td>0.0010 ETH</td></tr>
+                  <tr><td>11</td><td>#2,101–2,300</td><td>0.0011 ETH</td></tr>
+                  <tr><td>12</td><td>#2,301–2,500</td><td>0.0012 ETH</td></tr>
+                  <tr><td>13</td><td>#2,501–2,700</td><td>0.0013 ETH</td></tr>
+                  <tr><td>14</td><td>#2,701–2,900</td><td>0.0014 ETH</td></tr>
+                  <tr><td>15</td><td>#2,901–3,100</td><td>0.0015 ETH</td></tr>
+                  <tr><td>16</td><td>#3,101–3,300</td><td>0.0016 ETH</td></tr>
+                  <tr><td>17</td><td>#3,301–3,500</td><td>0.0017 ETH</td></tr>
+                  <tr><td>18</td><td>#3,501–3,700</td><td>0.0018 ETH</td></tr>
+                  <tr><td>19</td><td>#3,701–3,900</td><td>0.0019 ETH</td></tr>
+                  <tr><td>20</td><td>#3,901–4,100</td><td>0.0020 ETH</td></tr>
+                  <tr><td>21</td><td>#4,101–4,300</td><td>0.0021 ETH</td></tr>
+                  <tr><td>22</td><td>#4,301–4,444</td><td>0.0022 ETH</td></tr>
+                </tbody>
+                <tfoot><tr><th colspan="2">MAXIMUM MINT PROCEEDS</th><td>4.9368 ETH</td></tr></tfoot>
+              </table>
+            </div>
+            <div class="docs-callout"><strong>PRICE CHANGES AUTOMATICALLY.</strong><span>No owner action is required. After the free phase, a new price becomes active immediately after every 200 paid mints.</span></div>
+          </section>
+
+          <section class="docs-section" id="difficulty">
+            <p class="docs-number">04</p>
             <h2>Difficulty</h2>
             <p>Difficulty is measured in leading zero bits. For example, 36 bits means the hash must start with enough zero data to satisfy a 36-bit target. Every hash is independent: the closest result shown by the miner is not partial progress toward the next one.</p>
             <div class="code-panel"><span>EXPECTED SEARCH TIME</span><code>2 ^ difficulty / hashrate</code><small>Higher GPU speed increases your chance per second. The expected time is an average, not a guarantee.</small></div>
           </section>
 
           <section class="docs-section" id="art">
-            <p class="docs-number">04</p>
+            <p class="docs-number">05</p>
             <h2>On-chain art</h2>
             <p>The proof and token ID become the seed for the artwork. The SVG, metadata and traits are rendered by the smart-contract renderer and returned as a Base64 data URI. Hash Broker does not use IPFS or an external image server.</p>
             <div class="trait-line"><span>TERMINAL</span><span>GPU CORE</span><span>HASH SIGNAL</span><span>CYBER BROKER</span></div>
           </section>
 
           <section class="docs-section" id="staking">
-            <p class="docs-number">05</p>
+            <p class="docs-number">06</p>
             <h2>Staking</h2>
             <p>Hash Broker staking supports eight reward channels: <strong>$MANCER, $PONS, $NVDA, $AMZN, $AAPL, $STONKBROKER, $ZZZ</strong> and <strong>$CASHCAT</strong>.</p>
             <div class="docs-callout launch"><strong>STAKING ACTIVATES AT HASH BROKER #1,000.</strong><span>Until the collection reaches 1,000 minted NFTs, new staking transactions are blocked by the contract. After activation, approve your NFTs, stake them and claim funded rewards from the <a href="/stake">STAKE terminal</a>.</span></div>
           </section>
 
           <section class="docs-section" id="faq">
-            <p class="docs-number">06</p>
+            <p class="docs-number">07</p>
             <h2>FAQ</h2>
             <details open><summary>Can I mine from a phone?</summary><p>The terminal is designed for a desktop browser with WebGPU and a compatible GPU. A phone can connect and monitor the collection, but GPU mining performance may be limited.</p></details>
             <details><summary>Does restarting create progress?</summary><p>No. Hashes do not accumulate. Restarting only stops the search temporarily; it does not improve or reduce the target.</p></details>

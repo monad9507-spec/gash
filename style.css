@@ -248,6 +248,16 @@ footer { min-height: 84px; padding: 0 clamp(20px, 4vw, 68px); display: flex; ali
 .docs-section summary { cursor: pointer; color: var(--ink); font-weight: 900; }
 .docs-section details p { padding-top: 13px; font-size: .96rem !important; }
 .docs-contract { justify-self: end; text-decoration: none; padding: 12px 18px; font-size: .82rem; }
+.epoch-table-wrap { margin-top: 28px; overflow-x: auto; border: 1px solid var(--line); background: #070b11; }
+.epoch-table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+.epoch-table th,
+.epoch-table td { padding: 13px 16px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+.epoch-table thead th { color: #090b12; background: var(--purple); font-size: .72rem; letter-spacing: .06em; }
+.epoch-table tbody td:first-child { color: var(--muted); }
+.epoch-table tbody td:last-child { color: var(--gold); font-weight: 900; }
+.epoch-table tbody tr:hover { background: rgba(39,224,193,.055); }
+.epoch-table tfoot th,
+.epoch-table tfoot td { border-bottom: 0; color: var(--green); background: rgba(157,255,0,.06); font-weight: 900; }
 
 /* Staking terminal */
 .stake-page {

@@ -3,6 +3,7 @@ import { HashBrokerMiner } from "./miner.js";
 const CONFIG = window.HASH_BROKER_CONFIG;
 const SELECTORS = {
   totalSupply: "0x18160ddd",
+  mintPrice: "0x6817c76c",
   challenge: "0xd2ef7398",
   currentDifficulty: "0x5c062d6c",
   mine: "0xe43e322c"
@@ -16,6 +17,8 @@ const elements = {
   network: $("networkStatus"),
   mintedTop: $("mintedTop"),
   minted: $("mintedCount"),
+  mintPriceTop: $("mintPriceTop"),
+  mintPriceStat: $("mintPriceStat"),
   difficulty: $("difficultyStat"),
   bestBits: $("bestBits"),
   candidateBits: $("candidateBits"),
@@ -37,6 +40,7 @@ const elements = {
 let account = null;
 let difficulty = 36;
 let challenge = "0x" + "42".repeat(32);
+let mintPriceWei = BigInt(CONFIG.MINT_PRICE_WEI);
 let miner = null;
 let mining = false;
 let toastTimer = null;
@@ -97,6 +101,16 @@ function formatDuration(seconds) {
   if (seconds < 3600) return `${Math.round(seconds / 60)} min`;
   if (seconds < 86400) return `${(seconds / 3600).toFixed(1)} hr`;
   return `${(seconds / 86400).toFixed(1)} days`;
+}
+
+function formatEther(wei) {
+  if (wei === 0n) return "FREE";
+  const whole = wei / 10n ** 18n;
+  const fraction = (wei % 10n ** 18n)
+    .toString()
+    .padStart(18, "0")
+    .replace(/0+$/, "");
+  return `${whole}${fraction ? `.${fraction}` : ""} ETH`;
 }
 
 function updateDifficulty(next) {
@@ -182,15 +196,19 @@ function decodeUint(hex) {
 
 async function refreshState() {
   if (CONFIG.DEMO_MODE) return;
-  const [supplyHex, difficultyHex, nextChallenge] = await Promise.all([
+  const [supplyHex, priceHex, difficultyHex, nextChallenge] = await Promise.all([
     contractCall(SELECTORS.totalSupply),
+    contractCall(SELECTORS.mintPrice),
     contractCall(SELECTORS.currentDifficulty),
     contractCall(SELECTORS.challenge)
   ]);
   const supply = Number(decodeUint(supplyHex));
+  mintPriceWei = decodeUint(priceHex);
   const nextDifficulty = Number(decodeUint(difficultyHex));
   elements.minted.textContent = supply.toLocaleString();
   elements.mintedTop.textContent = supply.toLocaleString();
+  elements.mintPriceTop.textContent = formatEther(mintPriceWei);
+  elements.mintPriceStat.textContent = formatEther(mintPriceWei);
 
   const challengeChanged = challenge !== nextChallenge;
   const difficultyChanged = difficulty !== nextDifficulty;
@@ -221,7 +239,7 @@ async function submitProof(nonce, proofChallenge) {
     const tx = await rpc("eth_sendTransaction", [{
       from: account,
       to: CONFIG.CONTRACT_ADDRESS,
-      value: `0x${BigInt(CONFIG.MINT_PRICE_WEI).toString(16)}`,
+      value: `0x${mintPriceWei.toString(16)}`,
       data
     }]);
     setLog(`Mint submitted: ${tx.slice(0, 12)}… Waiting for confirmation.`);
