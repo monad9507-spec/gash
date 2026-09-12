@@ -114,6 +114,18 @@ async function rpc(method, params = []) {
   return provider.request({ method, params });
 }
 
+async function publicRpc(method, params = []) {
+  const response = await fetch(CONFIG.RPC_URL, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: Date.now(), method, params })
+  });
+  if (!response.ok) throw new Error(`Robinhood RPC returned ${response.status}.`);
+  const payload = await response.json();
+  if (payload.error) throw new Error(payload.error.message || "Robinhood RPC request failed.");
+  return payload.result;
+}
+
 async function switchNetwork() {
   try {
     await rpc("wallet_switchEthereumChain", [{ chainId: CONFIG.CHAIN_ID_HEX }]);
@@ -160,13 +172,16 @@ window.addEventListener("hashbroker:wallet", () => {
 });
 
 async function contractCall(data) {
-  return rpc("eth_call", [{ to: CONFIG.CONTRACT_ADDRESS, data }, "latest"]);
+  return publicRpc("eth_call", [{ to: CONFIG.CONTRACT_ADDRESS, data }, "latest"]);
 }
 
-function decodeUint(hex) { return BigInt(hex); }
+function decodeUint(hex) {
+  if (!hex || hex === "0x") throw new Error("The contract returned an empty value.");
+  return BigInt(hex);
+}
 
 async function refreshState() {
-  if (CONFIG.DEMO_MODE || !account) return;
+  if (CONFIG.DEMO_MODE) return;
   const [supplyHex, difficultyHex, nextChallenge] = await Promise.all([
     contractCall(SELECTORS.totalSupply),
     contractCall(SELECTORS.currentDifficulty),
@@ -328,6 +343,12 @@ function initialize() {
     window.ethereum.on?.("chainChanged", () => window.location.reload());
   }
 
+  if (!CONFIG.DEMO_MODE) {
+    refreshState().catch(() => {
+      elements.minted.textContent = "—";
+      elements.mintedTop.textContent = "—";
+    });
+  }
   stateTimer = setInterval(() => refreshState().catch(() => {}), 8000);
   window.addEventListener("beforeunload", () => clearInterval(stateTimer));
 }
