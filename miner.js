@@ -1,7 +1,9 @@
 const WORKGROUP_SIZE = 256;
-const WORKGROUPS = 256;
 const ITERATIONS = 128;
-const HASHES_PER_BATCH = WORKGROUP_SIZE * WORKGROUPS * ITERATIONS;
+const MODE_PROFILES = Object.freeze({
+  normal: Object.freeze({ initialWorkgroups: 128, minWorkgroups: 64, maxWorkgroups: 512, targetBatchMs: 300, yieldMs: 8 }),
+  turbo: Object.freeze({ initialWorkgroups: 512, minWorkgroups: 256, maxWorkgroups: 2048, targetBatchMs: 1000, yieldMs: 0 })
+});
 
 const shader = /* wgsl */ `
 const K: array<u32, 64> = array<u32, 64>(
@@ -130,6 +132,8 @@ export class HashBrokerMiner {
     this.totalHashes = 0;
     this.bestBits = 0;
     this.rateSamples = [];
+    this.mode = "normal";
+    this.workgroups = MODE_PROFILES.normal.initialWorkgroups;
   }
 
   async init() {
@@ -183,6 +187,13 @@ export class HashBrokerMiner {
     this.rateSamples = [];
   }
 
+  setMode(mode) {
+    if (!MODE_PROFILES[mode]) throw new Error("Unknown mining mode.");
+    this.mode = mode;
+    this.workgroups = MODE_PROFILES[mode].initialWorkgroups;
+    this.rateSamples = [];
+  }
+
   async start() {
     if (this.running) return;
     if (!this.baseParams) throw new Error("Mining job is not configured.");
@@ -193,6 +204,10 @@ export class HashBrokerMiner {
   stop() { this.running = false; }
 
   async runBatch() {
+    const batchMode = this.mode;
+    const profile = MODE_PROFILES[batchMode];
+    const batchWorkgroups = this.workgroups;
+    const hashesPerBatch = WORKGROUP_SIZE * batchWorkgroups * ITERATIONS;
     const params = new Uint32Array(16);
     params.set(this.baseParams, 0);
     params[13] = this.nonceLo;
@@ -205,7 +220,7 @@ export class HashBrokerMiner {
     const pass = encoder.beginComputePass();
     pass.setPipeline(this.pipeline);
     pass.setBindGroup(0, this.bindGroup);
-    pass.dispatchWorkgroups(WORKGROUPS);
+    pass.dispatchWorkgroups(batchWorkgroups);
     pass.end();
     encoder.copyBufferToBuffer(this.resultBuffer, 0, this.readBuffer, 0, 48);
 
@@ -216,7 +231,7 @@ export class HashBrokerMiner {
     this.readBuffer.unmap();
     const seconds = Math.max((performance.now() - started) / 1000, 0.001);
 
-    this.totalHashes += HASHES_PER_BATCH;
+    this.totalHashes += hashesPerBatch;
     const batchHashWords = result.slice(4, 12);
     const batchBestBits = Array.from(batchHashWords).reduce((count, word) => {
       if (count % 32 !== 0) return count;
@@ -226,11 +241,18 @@ export class HashBrokerMiner {
       this.bestBits = batchBestBits;
       this.bestHash = `0x${Array.from(batchHashWords, (word) => word.toString(16).padStart(8, "0")).join("")}`;
     }
-    const instantRate = HASHES_PER_BATCH / seconds;
+    const instantRate = hashesPerBatch / seconds;
     this.rateSamples.push(instantRate);
     if (this.rateSamples.length > 12) this.rateSamples.shift();
     const hashrate = this.rateSamples.reduce((sum, rate) => sum + rate, 0) / this.rateSamples.length;
-    this.callbacks.onProgress?.({ totalHashes: this.totalHashes, bestBits: this.bestBits, bestHash: this.bestHash, hashrate });
+    this.callbacks.onProgress?.({
+      totalHashes: this.totalHashes,
+      bestBits: this.bestBits,
+      bestHash: this.bestHash,
+      hashrate,
+      mode: batchMode,
+      workgroups: batchWorkgroups
+    });
 
     if (result[0] === 1) {
       this.running = false;
@@ -239,11 +261,24 @@ export class HashBrokerMiner {
       return;
     }
 
-    const next = BigInt(this.nonceLo) + BigInt(HASHES_PER_BATCH);
+    const next = BigInt(this.nonceLo) + BigInt(hashesPerBatch);
     this.nonceLo = Number(next & 0xffffffffn);
     this.nonceHi = (this.nonceHi + Number(next >> 32n)) >>> 0;
-    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    // Keep batches long enough to reduce GPU/CPU synchronization overhead, but
+    // short enough that challenge changes and STOP remain responsive.
+    const elapsedMs = seconds * 1000;
+    const adjustment = Math.min(1.5, Math.max(0.67, profile.targetBatchMs / elapsedMs));
+    const tuned = Math.round((batchWorkgroups * adjustment) / 32) * 32;
+    if (this.mode === batchMode) {
+      this.workgroups = Math.min(profile.maxWorkgroups, Math.max(profile.minWorkgroups, tuned));
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, profile.yieldMs));
   }
 }
 
-export function hashesPerBatch() { return HASHES_PER_BATCH; }
+export function hashesPerBatch(mode = "normal") {
+  const profile = MODE_PROFILES[mode] || MODE_PROFILES.normal;
+  return WORKGROUP_SIZE * profile.initialWorkgroups * ITERATIONS;
+}

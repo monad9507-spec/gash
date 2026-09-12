@@ -111,7 +111,14 @@
                 <span class="micro-label">GRAPHICS CARD</span>
                 <strong id="gpuName">NOT DETECTED</strong>
               </div>
-              <button class="mine-button" id="mineButton" type="button">START MINING</button>
+              <div class="mode-control">
+                <span class="micro-label">GPU POWER</span>
+                <div class="mode-buttons" role="group" aria-label="GPU mining power">
+                  <button class="mode-button active" id="normalMode" type="button" aria-pressed="true">NORMAL</button>
+                  <button class="mode-button" id="turboMode" type="button" aria-pressed="false">TURBO</button>
+                </div>
+              </div>
+              <button class="mine-button" id="mineButton" type="button">TEST GPU</button>
             </div>
 
             <div class="terminal-log" id="terminalLog" aria-live="polite">

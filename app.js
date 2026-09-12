@@ -29,6 +29,8 @@ const elements = {
   expected: $("expectedWait"),
   chance: $("chanceMinute"),
   gpu: $("gpuName"),
+  normalMode: $("normalMode"),
+  turboMode: $("turboMode"),
   log: $("terminalLog"),
   toast: $("toast"),
   portrait: $("portrait"),
@@ -45,6 +47,7 @@ let miner = null;
 let mining = false;
 let toastTimer = null;
 let stateTimer = null;
+let miningMode = "normal";
 
 function createMeters() {
   for (let i = 0; i < 52; i++) {
@@ -111,6 +114,18 @@ function formatEther(wei) {
     .padStart(18, "0")
     .replace(/0+$/, "");
   return `${whole}${fraction ? `.${fraction}` : ""} ETH`;
+}
+
+function setMiningMode(mode) {
+  miningMode = mode === "turbo" ? "turbo" : "normal";
+  elements.normalMode.classList.toggle("active", miningMode === "normal");
+  elements.turboMode.classList.toggle("active", miningMode === "turbo");
+  elements.normalMode.setAttribute("aria-pressed", String(miningMode === "normal"));
+  elements.turboMode.setAttribute("aria-pressed", String(miningMode === "turbo"));
+  miner?.setMode(miningMode);
+  setLog(miningMode === "turbo"
+    ? "TURBO enabled. Higher GPU load, temperature and power usage."
+    : "NORMAL enabled. Balanced GPU load and responsiveness.");
 }
 
 function updateDifficulty(next) {
@@ -322,6 +337,7 @@ async function startMining() {
     }
 
     const jobAccount = account || "0x1111111111111111111111111111111111111111";
+    miner.setMode(miningMode);
     miner.setJob({ address: jobAccount, challenge, difficulty });
     mining = true;
     elements.runState.textContent = CONFIG.DEMO_MODE ? "BENCHMARKING" : "SEARCHING";
@@ -329,7 +345,9 @@ async function startMining() {
     elements.mine.classList.add("stop");
     elements.portrait.classList.add("searching");
     elements.mine.disabled = false;
-    setLog(CONFIG.DEMO_MODE ? "GPU benchmark active. Searching a 36-bit sample proof." : "GPU active. Keep this tab open and watch for the MetaMask confirmation.");
+    setLog(CONFIG.DEMO_MODE
+      ? `GPU benchmark active in ${miningMode.toUpperCase()} mode.`
+      : `GPU active in ${miningMode.toUpperCase()} mode. Keep this tab open for the MetaMask confirmation.`);
     miner.start().catch((error) => {
       mining = false;
       showToast(error.message, true);
@@ -351,6 +369,8 @@ function initialize() {
   elements.network.textContent = CONFIG.DEMO_MODE ? "PREVIEW · ROBINHOOD CHAIN" : "ROBINHOOD CHAIN · LIVE";
   elements.connect.addEventListener("click", connectWallet);
   elements.mine.addEventListener("click", startMining);
+  elements.normalMode.addEventListener("click", () => setMiningMode("normal"));
+  elements.turboMode.addEventListener("click", () => setMiningMode("turbo"));
 
   if (window.ethereum) {
     window.ethereum.on?.("accountsChanged", (accounts) => {

@@ -176,9 +176,14 @@ code {
 .metrics span, .micro-label { display: block; margin-bottom: 8px; color: var(--muted); font-size: .7rem; font-weight: 700; letter-spacing: .055em; }
 .metrics strong { display: block; color: var(--green); font-size: clamp(.9rem, 1.6vw, 1.12rem); white-space: nowrap; }
 
-.machine-row { display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: end; }
+.machine-row { display: grid; grid-template-columns: auto minmax(130px, 1fr) auto auto; gap: 20px; align-items: end; }
 .gpu-pill { display: inline-block; padding: 8px 18px; background: var(--purple); color: #090b12; }
 .gpu-name strong { display: block; max-width: 260px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #cbd5e1; font-size: .87rem; }
+.mode-buttons { display: flex; border: 1px solid var(--line); background: #090d15; }
+.mode-button { border: 0; padding: 8px 10px; cursor: pointer; background: transparent; color: var(--muted); font-size: .7rem; font-weight: 900; }
+.mode-button + .mode-button { border-left: 1px solid var(--line); }
+.mode-button.active { background: var(--gold); color: #090b12; }
+.mode-button:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
 .mine-button { min-width: 156px; padding: 15px 20px; }
 .mine-button.stop { color: white; background: #9f2938; box-shadow: 5px 5px 0 #551720; }
 
