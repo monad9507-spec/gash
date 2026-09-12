@@ -20,7 +20,8 @@ struct Result {
   found: atomic<u32>,
   nonceLo: atomic<u32>,
   nonceHi: atomic<u32>,
-  bestBits: atomic<u32>
+  bestBits: atomic<u32>,
+  bestHash: array<atomic<u32>, 8>
 }
 
 @group(0) @binding(0) var<storage, read> params: Params;
@@ -97,7 +98,12 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
     let nonceHi = startHi + carry;
     let hash = digest(nonceLo, nonceHi);
     let bits = leadingZeros(hash);
-    atomicMax(&result.bestBits, bits);
+    let previousBest = atomicMax(&result.bestBits, bits);
+    if (bits > previousBest) {
+      for (var word = 0u; word < 8u; word = word + 1u) {
+        atomicStore(&result.bestHash[word], hash[word]);
+      }
+    }
     if (bits >= params.values[15]) {
       let previous = atomicExchange(&result.found, 1u);
       if (previous == 0u) {
@@ -146,8 +152,8 @@ export class HashBrokerMiner {
       compute: { module, entryPoint: "main" }
     });
     this.paramsBuffer = this.device.createBuffer({ size: 64, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
-    this.resultBuffer = this.device.createBuffer({ size: 16, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST });
-    this.readBuffer = this.device.createBuffer({ size: 16, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+    this.resultBuffer = this.device.createBuffer({ size: 48, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST });
+    this.readBuffer = this.device.createBuffer({ size: 48, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
     this.bindGroup = this.device.createBindGroup({
       layout: this.pipeline.getBindGroupLayout(0),
       entries: [
@@ -173,6 +179,7 @@ export class HashBrokerMiner {
     this.baseParams = [...addressWords, ...challengeWords];
     this.totalHashes = 0;
     this.bestBits = 0;
+    this.bestHash = null;
     this.rateSamples = [];
   }
 
@@ -192,7 +199,7 @@ export class HashBrokerMiner {
     params[14] = this.nonceHi;
     params[15] = this.difficulty;
     this.device.queue.writeBuffer(this.paramsBuffer, 0, params);
-    this.device.queue.writeBuffer(this.resultBuffer, 0, new Uint32Array(4));
+    this.device.queue.writeBuffer(this.resultBuffer, 0, new Uint32Array(12));
 
     const encoder = this.device.createCommandEncoder();
     const pass = encoder.beginComputePass();
@@ -200,7 +207,7 @@ export class HashBrokerMiner {
     pass.setBindGroup(0, this.bindGroup);
     pass.dispatchWorkgroups(WORKGROUPS);
     pass.end();
-    encoder.copyBufferToBuffer(this.resultBuffer, 0, this.readBuffer, 0, 16);
+    encoder.copyBufferToBuffer(this.resultBuffer, 0, this.readBuffer, 0, 48);
 
     const started = performance.now();
     this.device.queue.submit([encoder.finish()]);
@@ -210,12 +217,20 @@ export class HashBrokerMiner {
     const seconds = Math.max((performance.now() - started) / 1000, 0.001);
 
     this.totalHashes += HASHES_PER_BATCH;
-    this.bestBits = Math.max(this.bestBits, result[3]);
+    const batchHashWords = result.slice(4, 12);
+    const batchBestBits = Array.from(batchHashWords).reduce((count, word) => {
+      if (count % 32 !== 0) return count;
+      return word === 0 ? count + 32 : count + Math.clz32(word);
+    }, 0);
+    if (batchBestBits > this.bestBits) {
+      this.bestBits = batchBestBits;
+      this.bestHash = `0x${Array.from(batchHashWords, (word) => word.toString(16).padStart(8, "0")).join("")}`;
+    }
     const instantRate = HASHES_PER_BATCH / seconds;
     this.rateSamples.push(instantRate);
     if (this.rateSamples.length > 12) this.rateSamples.shift();
     const hashrate = this.rateSamples.reduce((sum, rate) => sum + rate, 0) / this.rateSamples.length;
-    this.callbacks.onProgress?.({ totalHashes: this.totalHashes, bestBits: this.bestBits, hashrate });
+    this.callbacks.onProgress?.({ totalHashes: this.totalHashes, bestBits: this.bestBits, bestHash: this.bestHash, hashrate });
 
     if (result[0] === 1) {
       this.running = false;

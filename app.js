@@ -233,13 +233,12 @@ async function waitForReceipt(txHash) {
   }
 }
 
-function updateProgress({ totalHashes, bestBits, hashrate }) {
+function updateProgress({ totalHashes, bestBits, bestHash, hashrate }) {
   elements.hashrate.textContent = formatRate(hashrate);
   elements.hashes.textContent = formatCount(totalHashes);
   elements.bestBits.textContent = `${bestBits} / ${difficulty} BITS`;
   elements.candidateBits.textContent = `${bestBits} / ${difficulty} BITS`;
-  const zeroNibbles = Math.min(58, Math.floor(bestBits / 4));
-  elements.bestHash.textContent = `0x${"0".repeat(zeroNibbles)}… best candidate`;
+  elements.bestHash.textContent = bestHash || "Waiting for the first GPU candidate…";
   paintMeters(bestBits, difficulty);
 
   const meanSeconds = 2 ** difficulty / hashrate;
