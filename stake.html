@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090b12" />
+    <meta name="description" content="Stake Hash Broker NFTs and monitor multi-token rewards on Robinhood Chain." />
+    <title>Hash Broker — Staking Terminal</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'%3E%3Crect width='32' height='32' fill='%2305080d'/%3E%3Cpath d='M5 7h22v5H5zm3 5h16v13H8z' fill='%2327e0c1'/%3E%3Cpath d='M11 15h3v3h-3zm7 0h3v3h-3zm-5 6h6v2h-6z' fill='%2303090d'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body class="stake-page">
+    <div class="noise" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="./index.html#miner" aria-label="Hash Broker home">
+        <span class="brand-mark" aria-hidden="true">#</span>
+        <span>HASH BROKER</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="./index.html#miner">MINE</a>
+        <a class="active" href="./stake.html" aria-current="page">STAKE</a>
+        <a href="./docs.html">DOCS</a>
+        <a href="./index.html#protocol">PROTOCOL</a>
+      </nav>
+      <button class="wallet-button" id="connectButton" type="button">CONNECT WALLET</button>
+    </header>
+
+    <main class="stake-main">
+      <section class="ticker" aria-label="Staking status">
+        <div><span class="status-dot" id="stakingDot"></span><span id="stakingStatus">PRE-LAUNCH</span></div>
+        <div><strong id="totalStakedTop">0</strong> HASH BROKERS STAKED</div>
+        <div><strong>8</strong> REWARD STREAMS</div>
+      </section>
+
+      <div class="reward-rail" aria-label="Supported reward tokens">
+        <span>$MANCER</span><span>$PONS</span><span>$NVDA</span><span>$AMZN</span>
+        <span>$AAPL</span><span>$STONKBROKER</span><span>$ZZZ</span><span>$CASHCAT</span>
+      </div>
+
+      <section class="staking-shell" aria-labelledby="stakingHeading">
+        <div class="section-label">
+          <span id="stakingHeading">MULTI-TOKEN STAKING TERMINAL</span>
+          <span id="terminalState">OFFLINE</span>
+        </div>
+
+        <div class="stake-summary" aria-label="Account staking summary">
+          <div><span>IN WALLET</span><strong id="walletCount">0</strong></div>
+          <div><span>YOUR STAKED</span><strong id="userStakedCount">0</strong></div>
+          <div><span>ACTIVE POOLS</span><strong id="activePools">0 / 8</strong></div>
+          <div><span>NETWORK STAKED</span><strong id="networkStaked">0</strong></div>
+        </div>
+
+        <p class="activation-note" id="activationNote">Staking unlocks automatically after the first 1,000 Hash Brokers are minted.</p>
+
+        <div class="stake-workspace">
+          <article class="asset-panel" aria-labelledby="walletAssetsHeading">
+            <div class="panel-heading">
+              <div>
+                <span class="panel-kicker">AVAILABLE</span>
+                <h1 id="walletAssetsHeading">YOUR WALLET</h1>
+              </div>
+              <button class="text-button" id="selectOwnedAll" type="button">SELECT ALL</button>
+            </div>
+            <div class="broker-grid" id="ownedGrid">
+              <p class="empty-state">Connect your wallet to load Hash Brokers.</p>
+            </div>
+          </article>
+
+          <aside class="stake-actions" aria-label="Staking actions">
+            <div class="selected-counter"><span>SELECTED</span><strong id="selectedOwned">0</strong></div>
+            <button class="action-button secondary" id="approveButton" type="button" disabled>APPROVE STAKING</button>
+            <button class="action-button" id="stakeButton" type="button" disabled>STAKE SELECTED</button>
+            <div class="action-divider" aria-hidden="true"></div>
+            <div class="selected-counter"><span>SELECTED STAKED</span><strong id="selectedStaked">0</strong></div>
+            <button class="action-button secondary" id="unstakeButton" type="button" disabled>UNSTAKE SELECTED</button>
+            <button class="text-button danger" id="unstakeAllButton" type="button" disabled>UNSTAKE ALL</button>
+          </aside>
+
+          <article class="asset-panel" aria-labelledby="stakedAssetsHeading">
+            <div class="panel-heading">
+              <div>
+                <span class="panel-kicker">EARNING</span>
+                <h1 id="stakedAssetsHeading">STAKED BROKERS</h1>
+              </div>
+              <button class="text-button" id="selectStakedAll" type="button">SELECT ALL</button>
+            </div>
+            <div class="broker-grid" id="stakedGrid">
+              <p class="empty-state">No Hash Brokers are staked.</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="terminal-log" id="stakingLog" aria-live="polite">
+          <span>&gt;</span> Connect a wallet to inspect your staking position.
+        </div>
+      </section>
+
+      <section class="rewards-shell" aria-labelledby="rewardsHeading">
+        <div class="rewards-heading">
+          <div>
+            <p class="eyebrow">LIVE REWARD CHANNELS</p>
+            <h2 id="rewardsHeading">YOUR ACCRUED TOKENS</h2>
+          </div>
+          <button class="action-button claim-button" id="claimAllButton" type="button" disabled>CLAIM ALL</button>
+        </div>
+        <div class="reward-grid" id="rewardGrid"></div>
+        <p class="pool-note">Rates and reserves are read directly from the staking contract. If a pool runs short, unpaid rewards remain claimable after it is refilled.</p>
+      </section>
+
+      <section class="staking-rules" aria-label="How staking works">
+        <article><span>01</span><h3>SELECT</h3><p>Choose one or several Hash Brokers held in your wallet.</p></article>
+        <article><span>02</span><h3>STAKE</h3><p>Approve once, then lock the selected NFTs in the staking contract.</p></article>
+        <article><span>03</span><h3>CLAIM</h3><p>Collect funded token rewards while your brokers remain staked.</p></article>
+      </section>
+    </main>
+
+    <footer>
+      <span>HASH BROKER © 2026</span>
+      <span>STAKE · ACCUMULATE · CLAIM</span>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./config.js"></script>
+    <script type="module" src="./wallet-appkit.js"></script>
+    <script type="module" src="./stake.js"></script>
+  </body>
+</html>

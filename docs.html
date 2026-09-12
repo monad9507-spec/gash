@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090b12" />
+    <meta name="description" content="Hash Broker documentation: proof-of-work minting, on-chain art and staking." />
+    <title>Hash Broker — Docs</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'%3E%3Crect width='32' height='32' fill='%2305080d'/%3E%3Cpath d='M5 7h22v5H5zm3 5h16v13H8z' fill='%2327e0c1'/%3E%3Cpath d='M11 15h3v3h-3zm7 0h3v3h-3zm-5 6h6v2h-6z' fill='%2303090d'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body class="docs-page">
+    <div class="noise" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="./index.html#miner" aria-label="Hash Broker home">
+        <span class="brand-mark" aria-hidden="true">#</span>
+        <span>HASH BROKER</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="./index.html#miner">MINE</a>
+        <a href="./stake.html">STAKE</a>
+        <a class="active" href="./docs.html" aria-current="page">DOCS</a>
+        <a href="./index.html#protocol">PROTOCOL</a>
+      </nav>
+      <a class="wallet-button docs-contract" href="./index.html#miner">OPEN TERMINAL</a>
+    </header>
+
+    <main class="docs-main">
+      <div class="docs-heading">
+        <p class="eyebrow">HASH BROKER / DOCUMENTATION</p>
+        <h1>READ THE<br /><span>PROTOCOL.</span></h1>
+        <p class="docs-intro">Hash Broker is a 4,444-item on-chain collection discovered through GPU-powered proof of work on Robinhood Chain.</p>
+      </div>
+
+      <div class="docs-layout">
+        <aside class="docs-index" aria-label="Documentation sections">
+          <span>CONTENTS</span>
+          <a href="#overview">01 / OVERVIEW</a>
+          <a href="#minting">02 / MINTING</a>
+          <a href="#difficulty">03 / DIFFICULTY</a>
+          <a href="#art">04 / ON-CHAIN ART</a>
+          <a href="#staking">05 / STAKING</a>
+          <a href="#faq">06 / FAQ</a>
+        </aside>
+
+        <div class="docs-content">
+          <section class="docs-section" id="overview">
+            <p class="docs-number">01</p>
+            <h2>Overview</h2>
+            <p>Hash Broker combines a collectible NFT with a permissionless discovery process. You connect a wallet, start the WebGPU miner and search for a valid SHA-256 proof. A successful proof lets you mint one unique cyber-terminal broker.</p>
+            <div class="docs-facts"><div><span>SUPPLY</span><strong>4,444</strong></div><div><span>NETWORK</span><strong>Robinhood Chain</strong></div><div><span>PRICE</span><strong>0.004444 ETH</strong></div><div><span>STORAGE</span><strong>100% ON-CHAIN</strong></div></div>
+          </section>
+
+          <section class="docs-section" id="minting">
+            <p class="docs-number">02</p>
+            <h2>How minting works</h2>
+            <ol class="docs-steps"><li><strong>Connect</strong><span>Switch your wallet to Robinhood Chain.</span></li><li><strong>Mine</strong><span>WebGPU tests nonces against the current challenge.</span></li><li><strong>Discover</strong><span>When your hash beats the target, the proof is ready.</span></li><li><strong>Mint</strong><span>Confirm the transaction and your broker is generated on-chain.</span></li></ol>
+            <div class="docs-callout"><strong>YOUR WALLET IS PART OF THE PROOF.</strong><span>A proof found by another wallet cannot be submitted by you.</span></div>
+          </section>
+
+          <section class="docs-section" id="difficulty">
+            <p class="docs-number">03</p>
+            <h2>Difficulty</h2>
+            <p>Difficulty is measured in leading zero bits. For example, 36 bits means the hash must start with enough zero data to satisfy a 36-bit target. Every hash is independent: the closest result shown by the miner is not partial progress toward the next one.</p>
+            <div class="code-panel"><span>EXPECTED SEARCH TIME</span><code>2 ^ difficulty / hashrate</code><small>Higher GPU speed increases your chance per second. The expected time is an average, not a guarantee.</small></div>
+          </section>
+
+          <section class="docs-section" id="art">
+            <p class="docs-number">04</p>
+            <h2>On-chain art</h2>
+            <p>The proof and token ID become the seed for the artwork. The SVG, metadata and traits are rendered by the smart-contract renderer and returned as a Base64 data URI. Hash Broker does not use IPFS or an external image server.</p>
+            <div class="trait-line"><span>TERMINAL</span><span>GPU CORE</span><span>HASH SIGNAL</span><span>CYBER BROKER</span></div>
+          </section>
+
+          <section class="docs-section" id="staking">
+            <p class="docs-number">05</p>
+            <h2>Staking</h2>
+            <p>Hash Broker staking supports eight reward channels: <strong>$MANCER, $PONS, $NVDA, $AMZN, $AAPL, $STONKBROKER, $ZZZ</strong> and <strong>$CASHCAT</strong>.</p>
+            <div class="docs-callout launch"><strong>STAKING ACTIVATES AT HASH BROKER #1,000.</strong><span>Until the collection reaches 1,000 minted NFTs, new staking transactions are blocked by the contract. After activation, approve your NFTs, stake them and claim funded rewards from the <a href="./stake.html">STAKE terminal</a>.</span></div>
+          </section>
+
+          <section class="docs-section" id="faq">
+            <p class="docs-number">06</p>
+            <h2>FAQ</h2>
+            <details open><summary>Can I mine from a phone?</summary><p>The terminal is designed for a desktop browser with WebGPU and a compatible GPU. A phone can connect and monitor the collection, but GPU mining performance may be limited.</p></details>
+            <details><summary>Does restarting create progress?</summary><p>No. Hashes do not accumulate. Restarting only stops the search temporarily; it does not improve or reduce the target.</p></details>
+            <details><summary>Is this financial advice?</summary><p>No. Hash Broker is a collectible experiment. Minting, trading and reward tokens involve risk. Never share your seed phrase or private key.</p></details>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer><span>HASH BROKER © 2026</span><span>PROOF OF WORK · PROOF OF OWNERSHIP</span></footer>
+  </body>
+</html>

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090b12" />
+    <meta name="description" content="Mine Hash Broker — 4,444 fully on-chain proof-of-work cyber brokers on Robinhood Chain." />
+    <title>Hash Broker — Mine On-Chain</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'%3E%3Crect width='32' height='32' fill='%2305080d'/%3E%3Cpath d='M5 7h22v5H5zm3 5h16v13H8z' fill='%2327e0c1'/%3E%3Cpath d='M11 15h3v3h-3zm7 0h3v3h-3zm-5 6h6v2h-6z' fill='%2303090d'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="./index.html#miner" aria-label="Hash Broker home">
+        <span class="brand-mark" aria-hidden="true">#</span>
+        <span>HASH BROKER</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a class="active" href="./index.html#miner" aria-current="page">MINE</a>
+        <a href="./stake.html">STAKE</a>
+        <a href="./docs.html">DOCS</a>
+        <a href="./index.html#protocol">PROTOCOL</a>
+        <a id="explorerLink" href="#" target="_blank" rel="noreferrer">CONTRACT</a>
+      </nav>
+      <button class="wallet-button" id="connectButton" type="button">CONNECT WALLET</button>
+    </header>
+
+    <main>
+      <section class="ticker" aria-label="Collection status">
+        <div><span class="status-dot"></span><span id="networkStatus">ROBINHOOD CHAIN</span></div>
+        <div><strong id="mintedTop">0</strong> / 4,444 MINED</div>
+        <div>PRICE <strong>0.004444 ETH</strong></div>
+      </section>
+
+      <section class="miner-shell" id="miner">
+        <div class="section-label"><span>PROOF-OF-WORK TERMINAL</span><span id="runState">IDLE</span></div>
+
+        <div class="miner-grid">
+          <article class="portrait-panel" aria-label="Current Hash Broker preview">
+            <div class="portrait-frame" id="portrait" aria-hidden="true">
+              <svg viewBox="0 0 512 512" shape-rendering="crispEdges" role="img" aria-label="Cyber-terminal Hash Broker">
+                <rect width="512" height="512" fill="#071017"/>
+                <path d="M0 64H512M0 128H512M0 192H512M0 256H512M0 320H512M0 384H512M0 448H512M64 0V512M128 0V512M192 0V512M256 0V512M320 0V512M384 0V512M448 0V512" stroke="#0d3440" stroke-width="3"/>
+                <rect x="64" y="64" width="12" height="12" fill="#27e0c1"/>
+                <rect x="436" y="308" width="12" height="12" fill="#27e0c1"/>
+                <path d="M92 414H58V326H38V244M420 414H454V302H476V224" fill="none" stroke="#182431" stroke-width="14"/>
+                <path d="M66 512V412L148 364H364L446 412V512Z" fill="#102d45"/>
+                <rect x="96" y="392" width="320" height="120" fill="#176b9b"/>
+                <rect x="120" y="414" width="272" height="98" fill="#081622"/>
+                <rect x="78" y="430" width="42" height="82" fill="#4aa8ff"/>
+                <rect x="392" y="430" width="42" height="82" fill="#4aa8ff"/>
+                <rect x="218" y="322" width="76" height="56" fill="#222d38"/>
+                <rect x="230" y="330" width="52" height="48" fill="#101821"/>
+                <rect x="96" y="112" width="320" height="218" fill="#303a46"/>
+                <rect x="108" y="124" width="296" height="190" fill="#111923"/>
+                <rect x="76" y="164" width="20" height="104" fill="#26313d"/>
+                <rect x="416" y="164" width="20" height="104" fill="#26313d"/>
+                <rect x="128" y="144" width="256" height="136" fill="#03090d"/>
+                <rect x="140" y="156" width="232" height="112" fill="#07151a"/>
+                <rect x="154" y="168" width="84" height="12" fill="#27e0c1"/>
+                <rect x="274" y="168" width="74" height="12" fill="#ff4f81"/>
+                <rect x="154" y="190" width="116" height="12" fill="#187b72"/>
+                <rect x="286" y="190" width="62" height="12" fill="#9b3157"/>
+                <rect x="154" y="212" width="66" height="12" fill="#27e0c1"/>
+                <rect x="248" y="212" width="100" height="12" fill="#ff4f81"/>
+                <rect x="154" y="234" width="142" height="12" fill="#187b72"/>
+                <rect x="312" y="234" width="36" height="12" fill="#9b3157"/>
+                <rect x="128" y="292" width="156" height="10" fill="#202b36"/>
+                <path d="M136 297H232" stroke="#526171" stroke-width="6" stroke-dasharray="18 8"/>
+                <rect x="320" y="290" width="20" height="14" fill="#27e0c1"/>
+                <rect x="348" y="290" width="20" height="14" fill="#ffb000"/>
+                <rect x="144" y="76" width="224" height="36" fill="#202b36"/>
+                <rect x="160" y="58" width="192" height="24" fill="#364654"/>
+                <path d="M178 70H326" stroke="#27e0c1" stroke-width="12" stroke-dasharray="18 8"/>
+                <path d="M218 408L256 386L294 408V454L256 476L218 454Z" fill="#0c161d" stroke="#27e0c1" stroke-width="10"/>
+                <rect x="244" y="414" width="24" height="36" fill="#27e0c1"/>
+              </svg>
+            </div>
+            <div class="portrait-caption">
+              <span>THE NEXT HASH BROKER</span>
+              <strong id="candidateBits">0 / 36 BITS</strong>
+            </div>
+          </article>
+
+          <section class="console-panel" aria-label="Mining controls">
+            <div class="hash-block">
+              <div class="label-row"><span>BEST HASH FOUND</span><span id="bestBits">0 / 36 BITS</span></div>
+              <div class="bit-meter" id="bitMeter" aria-label="Leading zero bits"></div>
+              <code id="bestHash">0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff</code>
+            </div>
+
+            <div class="target-block">
+              <div class="label-row"><span>TARGET TO BEAT</span><span id="targetBits">36 LEADING ZERO BITS</span></div>
+              <div class="target-meter" id="targetMeter"></div>
+            </div>
+
+            <div class="metrics">
+              <div><span>SPEED</span><strong id="hashrate">0 H/s</strong></div>
+              <div><span>HASHES TRIED</span><strong id="hashesTried">0</strong></div>
+              <div><span>EXPECTED WAIT</span><strong id="expectedWait">—</strong></div>
+              <div><span>CHANCE / MIN</span><strong id="chanceMinute">—</strong></div>
+            </div>
+
+            <div class="machine-row">
+              <div>
+                <span class="micro-label">MACHINE</span>
+                <strong class="gpu-pill">WEBGPU</strong>
+              </div>
+              <div class="gpu-name">
+                <span class="micro-label">GRAPHICS CARD</span>
+                <strong id="gpuName">NOT DETECTED</strong>
+              </div>
+              <button class="mine-button" id="mineButton" type="button">TEST GPU</button>
+            </div>
+
+            <div class="terminal-log" id="terminalLog" aria-live="polite">
+              <span>&gt;</span> Connect a wallet or test this GPU in benchmark mode.
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="stats-strip" aria-label="Mining statistics">
+        <div><span>SUPPLY</span><strong><span id="mintedCount">0</span> / 4,444</strong></div>
+        <div><span>DIFFICULTY</span><strong id="difficultyStat">36 BITS</strong></div>
+        <div><span>MINT PRICE</span><strong>0.004444 ETH</strong></div>
+        <div><span>STORAGE</span><strong>100% ON-CHAIN</strong></div>
+      </section>
+
+      <section class="protocol" id="protocol">
+        <div>
+          <p class="eyebrow">THE PROTOCOL</p>
+          <h1>YOU DON'T BUY A BROKER.<br /><span>YOU DISCOVER ONE.</span></h1>
+        </div>
+        <div class="protocol-copy">
+          <p>Your GPU searches for a SHA-256 proof tied to your wallet and the latest on-chain challenge. When the result beats the target, the contract verifies it and assembles your cyber broker.</p>
+          <p>Every SVG, trait and metadata field lives on Robinhood Chain. No IPFS. No external image server.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>HASH BROKER © 2026</span>
+      <span>PROOF OF WORK · PROOF OF OWNERSHIP</span>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./config.js"></script>
+    <script type="module" src="./wallet-appkit.js"></script>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
