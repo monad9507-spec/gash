@@ -16,10 +16,11 @@ const SELECTORS = Object.freeze({
   rewardTokenAt: "0x79f5ecb7",
   earned: "0x211dc32d",
   rewardInfo: "0xcbecf6b5",
+  claimsReady: "0x0caedd97",
+  nextClaimAt: "0x11a163e9",
   stake: "0x0fbf0a93",
   unstake: "0xe449f341",
   unstakeAll: "0x35322f37",
-  claim: "0x1e83409a",
   claimAll: "0xd1058e59"
 });
 
@@ -46,6 +47,7 @@ const elements = {
   unstakeAll: $("unstakeAllButton"),
   claimAll: $("claimAllButton"),
   rewards: $("rewardGrid"),
+  claimSchedule: $("claimSchedule"),
   log: $("stakingLog"),
   toast: $("toast")
 };
@@ -60,9 +62,13 @@ let stakingOpen = false;
 let stakingActivated = false;
 let mintedSupply = 0n;
 let pendingRewards = [];
+let nextClaimAt = 0n;
+let claimsAvailable = false;
 let busy = false;
 let toastTimer = null;
 let refreshTimer = null;
+let uiTimer = null;
+let rewardSnapshotAt = Date.now();
 
 function stripHex(value) { return value.startsWith("0x") ? value.slice(2) : value; }
 function padWord(value) { return stripHex(value).padStart(64, "0"); }
@@ -111,6 +117,18 @@ function formatUnits(value, decimals = 18, precision = 4) {
   const whole = value / scale;
   const fraction = (value % scale).toString().padStart(decimals, "0").slice(0, precision).replace(/0+$/, "");
   return fraction ? `${whole.toLocaleString()}.${fraction}` : whole.toLocaleString();
+}
+
+function claimIsReady() {
+  return claimsAvailable;
+}
+
+function formatCountdown(seconds) {
+  if (seconds <= 0n) return "READY NOW";
+  const days = seconds / 86400n;
+  const hours = (seconds % 86400n) / 3600n;
+  const minutes = (seconds % 3600n) / 60n;
+  return `${days}D ${hours}H ${minutes}M`;
 }
 
 function setLog(message) { elements.log.innerHTML = `<span>&gt;</span> ${message}`; }
@@ -278,17 +296,22 @@ function renderRewardCards() {
     const symbol = document.createElement("strong");
     symbol.textContent = `$${reward.symbol}`;
     const status = document.createElement("span");
-    status.textContent = reward.active ? "ACTIVE" : "PENDING";
+    status.textContent = reward.active ? "0.5 / HOUR" : "PENDING";
     status.className = reward.active ? "pool-active" : "";
     header.append(symbol, status);
 
     const amount = document.createElement("p");
     amount.className = "reward-amount";
-    amount.textContent = formatUnits(reward.earned || 0n, reward.decimals);
+    const elapsed = BigInt(Math.max(0, Math.floor((Date.now() - rewardSnapshotAt) / 1000)));
+    const liveIncrement = reward.active
+      ? (reward.rate || 0n) * BigInt(stakedTokenIds.length) * elapsed / 3600n
+      : 0n;
+    amount.textContent = formatUnits((reward.earned || 0n) + liveIncrement, reward.decimals);
+    amount.title = "Accumulated USDG, claimable after the common week is funded and finalized.";
 
     const rate = document.createElement("p");
     rate.className = "reward-rate";
-    const daily = (reward.rate || 0n) * 86400n * BigInt(stakedTokenIds.length);
+    const daily = (reward.rate || 0n) * 24n * BigInt(stakedTokenIds.length);
     rate.textContent = reward.active
       ? `${formatUnits(daily, reward.decimals)} / DAY FOR YOUR STAKE`
       : "RATE SET AT LAUNCH";
@@ -302,12 +325,9 @@ function renderRewardCards() {
     const claim = document.createElement("button");
     claim.className = "mini-claim";
     claim.type = "button";
-    claim.textContent = "CLAIM";
-    claim.disabled = busy || !account || !reward.active || reward.earned === 0n;
-    claim.addEventListener("click", () => {
-      const data = SELECTORS.claim + encodeAddress(reward.address);
-      sendTransaction(CONFIG.STAKING_ADDRESS, data, `Claiming $${reward.symbol}…`, `$${reward.symbol} claimed.`);
-    });
+    claim.textContent = "WEEKLY BATCH";
+    claim.disabled = true;
+    claim.title = "USDG becomes claimable after the common weekly pool is fully funded.";
 
     card.append(header, amount, rate, reserve, claim);
     elements.rewards.append(card);
@@ -326,7 +346,22 @@ function updateButtons() {
   elements.stake.disabled = !canTransact || !stakingOpen || !approved || selectedOwned.size === 0;
   elements.unstake.disabled = !canTransact || selectedStaked.size === 0;
   elements.unstakeAll.disabled = !canTransact || stakedTokenIds.length === 0;
-  elements.claimAll.disabled = !canTransact || !pendingRewards.some((reward) => reward.earned > 0n);
+  const ready = claimIsReady();
+  elements.claimAll.disabled = !canTransact || !ready || !pendingRewards.some((reward) => reward.earned > 0n);
+  const now = BigInt(Math.floor(Date.now() / 1000));
+  const weekEnded = nextClaimAt > 0n && now >= nextClaimAt;
+  elements.claimAll.textContent = ready
+    ? "CLAIM ALL"
+    : (weekEnded ? "AWAITING WEEKLY FUNDING" : "WEEKLY CLAIM LOCKED");
+  if (!account || nextClaimAt === 0n) {
+    elements.claimSchedule.textContent = "All stakers share the same seven-day reward cycle.";
+  } else if (ready) {
+    elements.claimSchedule.textContent = "Your weekly payout is ready. Use CLAIM ALL to collect every available reward token.";
+  } else if (weekEnded) {
+    elements.claimSchedule.textContent = "THE WEEK HAS ENDED — WAITING FOR THE USDG POOL TO BE FUNDED AND FINALIZED";
+  } else {
+    elements.claimSchedule.textContent = `CURRENT WEEK CLOSES IN ${formatCountdown(nextClaimAt - now)}`;
+  }
 }
 
 function renderAll() {
@@ -366,12 +401,13 @@ async function loadRewardState() {
     });
   }
   pendingRewards = rewards;
-  elements.activePools.textContent = `${rewards.filter((reward) => reward.active).length} / 8`;
+  rewardSnapshotAt = Date.now();
+  elements.activePools.textContent = `${rewards.filter((reward) => reward.active).length} / 1`;
 }
 
 async function refreshAccount() {
   if (!READY || !account) return;
-  const [ownedResult, stakedResult, approvedResult, totalResult, openResult, mintedResult] = await Promise.all([
+  const [ownedResult, stakedResult, approvedResult, totalResult, openResult, mintedResult, nextClaimResult, claimsReadyResult] = await Promise.all([
     contractCall(CONFIG.CONTRACT_ADDRESS, SELECTORS.tokensOfOwner + encodeAddress(account)),
     contractCall(CONFIG.STAKING_ADDRESS, SELECTORS.stakedTokens + encodeAddress(account)),
     contractCall(
@@ -380,7 +416,9 @@ async function refreshAccount() {
     ),
     contractCall(CONFIG.STAKING_ADDRESS, SELECTORS.totalStaked),
     contractCall(CONFIG.STAKING_ADDRESS, SELECTORS.stakingOpen),
-    contractCall(CONFIG.CONTRACT_ADDRESS, SELECTORS.collectionTotalSupply)
+    contractCall(CONFIG.CONTRACT_ADDRESS, SELECTORS.collectionTotalSupply),
+    contractCall(CONFIG.STAKING_ADDRESS, SELECTORS.nextClaimAt + encodeAddress(account)),
+    contractCall(CONFIG.STAKING_ADDRESS, SELECTORS.claimsReady + encodeAddress(account))
   ]);
 
   ownedTokenIds = decodeUintArray(ownedResult);
@@ -388,6 +426,8 @@ async function refreshAccount() {
   approved = decodeUint(approvedResult) === 1n;
   stakingOpen = decodeUint(openResult) === 1n;
   mintedSupply = decodeUint(mintedResult);
+  nextClaimAt = decodeUint(nextClaimResult);
+  claimsAvailable = decodeUint(claimsReadyResult) === 1n;
   stakingActivated = mintedSupply >= BigInt(CONFIG.STAKE_ACTIVATION_SUPPLY || 1000);
   const total = decodeUint(totalResult);
   elements.totalTop.textContent = shortNumber(total);
@@ -453,7 +493,7 @@ function initialize() {
     elements.status.textContent = "PRE-LAUNCH";
     elements.terminalState.textContent = "CONFIG PENDING";
     elements.statusDot.classList.add("paused");
-    setLog("Staking interface ready. Add the deployed contracts, token addresses, rates and reserves to activate it.");
+    setLog("Staking interface ready. Add the deployed weekly USDG contract to activate it.");
   } else {
     refreshPublicState();
   }
@@ -492,7 +532,14 @@ function initialize() {
   refreshTimer = setInterval(() => {
     if (account) refreshAccount().catch(() => {}); else refreshPublicState();
   }, 15000);
-  window.addEventListener("beforeunload", () => clearInterval(refreshTimer));
+  uiTimer = setInterval(() => {
+    renderRewardCards();
+    updateButtons();
+  }, 1000);
+  window.addEventListener("beforeunload", () => {
+    clearInterval(refreshTimer);
+    clearInterval(uiTimer);
+  });
 }
 
 initialize();

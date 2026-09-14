@@ -7,20 +7,20 @@
     <meta name="description" content="Stake Hash Broker NFTs and monitor multi-token rewards on Robinhood Chain." />
     <title>Hash Broker — Staking Terminal</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'%3E%3Crect width='32' height='32' fill='%2305080d'/%3E%3Cpath d='M5 7h22v5H5zm3 5h16v13H8z' fill='%2327e0c1'/%3E%3Cpath d='M11 15h3v3h-3zm7 0h3v3h-3zm-5 6h6v2h-6z' fill='%2303090d'/%3E%3C/svg%3E" />
-    <link rel="stylesheet" href="./style.css?v=20260912-2" />
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body class="stake-page">
     <div class="noise" aria-hidden="true"></div>
     <header class="topbar">
-      <a class="brand" href="/#miner" aria-label="Hash Broker home">
+      <a class="brand" href="./index.html#miner" aria-label="Hash Broker home">
         <span class="brand-mark" aria-hidden="true">#</span>
         <span>HASH BROKER</span>
       </a>
       <nav aria-label="Primary navigation">
-        <a href="/#miner">MINE</a>
-        <a class="active" href="/stake" aria-current="page">STAKE</a>
-        <a href="/docs">DOCS</a>
-        <a href="/#protocol">PROTOCOL</a>
+        <a href="./index.html#miner">MINE</a>
+        <a class="active" href="./stake.html" aria-current="page">STAKE</a>
+        <a href="./docs.html">DOCS</a>
+        <a href="./index.html#protocol">PROTOCOL</a>
       </nav>
       <button class="wallet-button" id="connectButton" type="button">CONNECT WALLET</button>
     </header>
@@ -29,24 +29,24 @@
       <section class="ticker" aria-label="Staking status">
         <div><span class="status-dot" id="stakingDot"></span><span id="stakingStatus">PRE-LAUNCH</span></div>
         <div><strong id="totalStakedTop">0</strong> HASH BROKERS STAKED</div>
-        <div><strong>8</strong> REWARD STREAMS</div>
+        <div><strong>0.5 USDG</strong> / NFT / HOUR</div>
       </section>
 
-      <div class="reward-rail" aria-label="Supported reward tokens">
-        <span>$MANCER</span><span>$PONS</span><span>$NVDA</span><span>$AMZN</span>
-        <span>$AAPL</span><span>$STONKBROKER</span><span>$ZZZ</span><span>$CASHCAT</span>
+      <div class="reward-rail" aria-label="USDG staking rate">
+        <span>USDG REWARDS</span><span>0.5 / HOUR</span><span>12 / DAY</span>
+        <span>84 / WEEK</span><span>COMMON 7-DAY CLAIM</span>
       </div>
 
       <section class="staking-shell" aria-labelledby="stakingHeading">
         <div class="section-label">
-          <span id="stakingHeading">MULTI-TOKEN STAKING TERMINAL</span>
+          <span id="stakingHeading">USDG STAKING TERMINAL</span>
           <span id="terminalState">OFFLINE</span>
         </div>
 
         <div class="stake-summary" aria-label="Account staking summary">
           <div><span>IN WALLET</span><strong id="walletCount">0</strong></div>
           <div><span>YOUR STAKED</span><strong id="userStakedCount">0</strong></div>
-          <div><span>ACTIVE POOLS</span><strong id="activePools">0 / 8</strong></div>
+          <div><span>USDG POOL</span><strong id="activePools">0 / 1</strong></div>
           <div><span>NETWORK STAKED</span><strong id="networkStaked">0</strong></div>
         </div>
 
@@ -98,19 +98,20 @@
       <section class="rewards-shell" aria-labelledby="rewardsHeading">
         <div class="rewards-heading">
           <div>
-            <p class="eyebrow">LIVE REWARD CHANNELS</p>
-            <h2 id="rewardsHeading">YOUR ACCRUED TOKENS</h2>
+            <p class="eyebrow">LIVE USDG REWARDS</p>
+            <h2 id="rewardsHeading">YOUR ACCUMULATED USDG</h2>
           </div>
           <button class="action-button claim-button" id="claimAllButton" type="button" disabled>CLAIM ALL</button>
         </div>
+        <p class="activation-note" id="claimSchedule">All stakers share the same seven-day reward cycle.</p>
         <div class="reward-grid" id="rewardGrid"></div>
-        <p class="pool-note">Rates and reserves are read directly from the staking contract. If a pool runs short, unpaid rewards remain claimable after it is refilled.</p>
+        <p class="pool-note">Each staked NFT earns exactly 0.5 USDG per hour: 12 USDG per day and 84 USDG for a complete week. The counter updates while the NFT is staked. After the common seven-day period ends, CLAIM ALL opens only when the owner deposits enough USDG and finalizes that week on-chain.</p>
       </section>
 
       <section class="staking-rules" aria-label="How staking works">
         <article><span>01</span><h3>SELECT</h3><p>Choose one or several Hash Brokers held in your wallet.</p></article>
         <article><span>02</span><h3>STAKE</h3><p>Approve once, then lock the selected NFTs in the staking contract.</p></article>
-        <article><span>03</span><h3>CLAIM</h3><p>Collect funded token rewards while your brokers remain staked.</p></article>
+        <article><span>03</span><h3>CLAIM USDG</h3><p>After the common week is fully funded and finalized, collect all accumulated USDG.</p></article>
       </section>
     </main>
 
@@ -122,6 +123,6 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="./config.js"></script>
     <script type="module" src="./wallet-appkit.js"></script>
-    <script type="module" src="./stake.js?v=20260912-2"></script>
+    <script type="module" src="./stake.js"></script>
   </body>
 </html>
